@@ -6,9 +6,9 @@
       + fvm::div(phi, U)
       + turbulence->divDevReff(U)
     );
-
+    
     UEqn.relax();
-
+    
     if (pimple.momentumPredictor())
     {
         solve
@@ -22,7 +22,7 @@
                   - fvc::snGrad(p_rgh)
                 )*mesh.magSf()
             )
-            -
-            pBalanceEq
+            //-
+            //pBalanceEq
         );
     }

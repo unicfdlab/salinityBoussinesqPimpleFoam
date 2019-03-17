@@ -1,21 +1,27 @@
 {
     volScalarField rAU("rAU", 1.0/UEqn.A());
+    volVectorField HbyA(constrainHbyA(rAU*UEqn.H(), U, p_rgh));
     surfaceScalarField rAUf("(1|A(U))", fvc::interpolate(rAU));
-
-    U = rAU*UEqn.H();
-
+    
+    U = HbyA;
+    
     bool ddtPhiCorr = false;
-    pimple.dict().lookup("ddtPhiCorr") >> ddtPhiCorr;
-
+    if (pimple.dict().found("ddtPhiCorr"))
+    {
+        pimple.dict().lookup("ddtPhiCorr") >> ddtPhiCorr;
+    }
+    
     phi = (fvc::interpolate(U) & mesh.Sf());
     
     if (ddtPhiCorr)
-        phi += rAUf * fvc::ddtCorr(U, phi);
+	phi += rAUf * fvc::ddtCorr(U, phi);
 
-    //surfaceScalarField buoyancyPhi(rAUf*ghf*fvc::snGrad(rhok)*mesh.magSf());
-    surfaceScalarField buoyancyPhi(rAUf*ghf*fvc::snGrad(rhok)*mesh.magSf() + fluxEq*rAUf);
+    surfaceScalarField buoyancyPhi(rAUf*ghf*fvc::snGrad(rhok)*mesh.magSf());
     phi -= buoyancyPhi;
-
+    
+    // Update the pressure BCs to ensure flux consistency
+    constrainPressure(p_rgh, U, phi, rAUf);
+    
     while (pimple.correctNonOrthogonal())
     {
         fvScalarMatrix p_rghEqn
@@ -41,8 +47,6 @@
             U.correctBoundaryConditions();
         }
     }
-    
-    fvc::makeRelative(phi, U);
 
     #include "continuityErrs.H"
     

@@ -47,11 +47,10 @@ Description
 
 #include "fvCFD.H"
 #include "singlePhaseTransportModel.H"
-#include "turbulenceModel.H"
+#include "turbulentTransportModel.H"
 #include "pimpleControl.H"
 #include "MULES.H"
-#include "IMULES.H"
-#include "CellProbe.H"
+
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -63,6 +62,7 @@ int main(int argc, char *argv[])
     #include "readGravitationalAcceleration.H"
     #include "createFields.H"
     #include "initContinuityErrs.H"
+    #include "createTimeControls.H"
     #include "readTimeControls.H"
     #include "CourantNo.H"
     #include "setInitialDeltaT.H"
@@ -86,7 +86,6 @@ int main(int argc, char *argv[])
         // --- Pressure-velocity PIMPLE corrector loop
         while (pimple.loop())
         {
-	    //#include "AEqn.H"
             #include "UEqn.H"
             #include "salinityEqn.H"
 
@@ -102,13 +101,7 @@ int main(int argc, char *argv[])
             }
         }
 
-	cellProbe.probe();
-
-	runTime.write();
-        //if(runTime.write())
-        {
-	    #include "printData.H"
-        }
+        runTime.write();
 
         Info<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
             << "  ClockTime = " << runTime.elapsedClockTime() << " s"

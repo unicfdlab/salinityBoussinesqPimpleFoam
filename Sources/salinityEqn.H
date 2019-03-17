@@ -67,7 +67,7 @@
 	    -Sp*SA
         );
         
-        MULES::implicitSolve
+        MULES::explicitSolve
         (
             geometricOneField(),
             SA,

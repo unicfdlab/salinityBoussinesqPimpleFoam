@@ -61,7 +61,10 @@
         ),
         1.0 - beta*(SA - SARef)
     );
-
+    
+    volScalarField rhok0 = rhok;
+    rhok0.rename("rhok0");
+    
     Info<< "Calculating field g.h\n" << endl;
     volScalarField gh("gh", g & mesh.C());
     surfaceScalarField ghf("ghf", g & mesh.Cf());
@@ -99,35 +102,9 @@
             pRefValue - getRefCellValue(p, pRefCell)
         );
     }
-
-    volVectorField gradRhoTilde (fvc::grad(rho0*rhok - rho0*rhok));
-    gradRhoTilde.rename("gradRhoTilde");
-
-    CellProbe cellProbe (runTime, mesh);
-
-    surfaceScalarField fluxEq
-    (
-	IOobject
-	(
-	    "fluxEq",
-	    runTime.timeName(),
-	    mesh,
-	    IOobject::READ_IF_PRESENT,
-	    IOobject::AUTO_WRITE
-	),
-	(-ghf*fvc::snGrad(rhok) - fvc::snGrad(p_rgh)) * mesh.magSf()
-    );
     
-    volScalarField rhok0 = rhok;
-    volScalarField prgh0 = p_rgh;
-    
-    volVectorField pBalanceEq
-    (
-	fvc::reconstruct
-	(
-	    fluxEq
-	)
-    );
+
+
 
 
 

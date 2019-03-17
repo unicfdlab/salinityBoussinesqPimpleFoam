@@ -2,10 +2,10 @@
 cd ${0%/*} || exit 1    # run from this directory
 set -x
 
-cd libSalinitySolverLib; wmake libso; cd ../
+#cd libSalinitySolverLib; wmake libso; cd ../
 
 wmake
 
-cd salinityBoussinesqPimpleEqDyMFoam; wmake; cd ../
+#cd salinityBoussinesqPimpleEqDyMFoam; wmake; cd ../
 
 # ----------------------------------------------------------------- end-of-file
