@@ -34,13 +34,6 @@
                 SA,
                 salinityScheme
             )
-//don't use compressive flux
-//            + fvc::flux
-//            (
-//                -fvc::flux(-phir, scalar(1) - alpha1, alpharScheme),
-//                alpha1,
-//                alpharScheme
-//            )
         );
         
         volScalarField Sp
@@ -84,4 +77,7 @@
     Info << "Domain salinity: " << domainSalinity.value() << endl;
 
     rhok = 1.0 - beta*(SA - SARef);
+    rhok.correctBoundaryConditions();
+    rhokstar = rhok - rhok0;
+    rhokstar.correctBoundaryConditions();
 }

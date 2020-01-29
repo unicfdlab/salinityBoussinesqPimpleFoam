@@ -16,7 +16,8 @@
     if (ddtPhiCorr)
 	phi += rAUf * fvc::ddtCorr(U, phi);
 
-    surfaceScalarField buoyancyPhi(rAUf*ghf*fvc::snGrad(rhok)*mesh.magSf());
+    //surfaceScalarField buoyancyPhi(rAUf*ghf*fvc::snGrad(rhokstar)*mesh.magSf());
+    surfaceScalarField buoyancyPhi(-rAUf*(linearInterpolate(g*rhokstar)&mesh.Sf()));
     phi -= buoyancyPhi;
     
     // Update the pressure BCs to ensure flux consistency
@@ -43,7 +44,8 @@
 
             // Correct the momentum source with the pressure gradient flux
             // calculated from the relaxed pressure
-            U -= rAU*fvc::reconstruct((buoyancyPhi + p_rghEqn.flux())/rAUf);
+            //U -= rAU*fvc::reconstruct((buoyancyPhi + p_rghEqn.flux())/rAUf);
+            U -= (fvc::grad(p_rgh) - rhokstar*g)*rAU;
             U.correctBoundaryConditions();
         }
     }
@@ -55,16 +57,15 @@
 	#include "salinityEqn.H"
     }
 
-    p = p_rgh + rhok*gh;
-
-    if (p_rgh.needReference())
-    {
-        p += dimensionedScalar
-        (
-            "p",
-            p.dimensions(),
-            pRefValue - getRefCellValue(p, pRefCell)
-        );
-        p_rgh = p - rhok*gh;
-    }
+    //p = p_rgh + rhok*gh;
+    //if (p_rgh.needReference())
+    //{
+    //    p += dimensionedScalar
+    //    (
+    //        "p",
+    //        p.dimensions(),
+    //        pRefValue - getRefCellValue(p, pRefCell)
+    //    );
+    //    p_rgh = p - rhok*gh;
+    //}
 }

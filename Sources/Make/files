@@ -1,3 +1,4 @@
 salinityBoussinesqPimpleEqFoam.C
+buoyantPressure/buoyantPressureFvPatchScalarField.C
 
 EXE = $(FOAM_USER_APPBIN)/salinityBoussinesqPimpleEqFoam

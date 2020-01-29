@@ -86,15 +86,15 @@ int main(int argc, char *argv[])
         // --- Pressure-velocity PIMPLE corrector loop
         while (pimple.loop())
         {
-            #include "UEqn.H"
             #include "salinityEqn.H"
-
+            #include "UEqn.H"
+            
             // --- Pressure corrector loop
             while (pimple.correct())
             {
                 #include "pEqn.H"
             }
-
+            
             if (pimple.turbCorr())
             {
                 turbulence->correct();
@@ -102,6 +102,11 @@ int main(int argc, char *argv[])
         }
 
         runTime.write();
+        
+        if (runTime.outputTime())
+        {
+            rhok.write();
+        }
 
         Info<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
             << "  ClockTime = " << runTime.elapsedClockTime() << " s"

@@ -65,43 +65,24 @@
     volScalarField rhok0 = rhok;
     rhok0.rename("rhok0");
     
+    volScalarField rhokstar = rhok;
+    rhokstar.rename("rhokstar");
+    
+    rhokstar = rhok - rhok0;
+    
     Info<< "Calculating field g.h\n" << endl;
     volScalarField gh("gh", g & mesh.C());
     surfaceScalarField ghf("ghf", g & mesh.Cf());
-
-    volScalarField p
-    (
-        IOobject
-        (
-            "p",
-            runTime.timeName(),
-            mesh,
-            IOobject::NO_READ,
-            IOobject::AUTO_WRITE
-        ),
-        p_rgh + rhok*gh
-    );
 
     label pRefCell = 0;
     scalar pRefValue = 0.0;
     setRefCell
     (
-        p,
         p_rgh,
         mesh.solutionDict().subDict("PIMPLE"),
         pRefCell,
         pRefValue
     );
-
-    if (p_rgh.needReference())
-    {
-        p += dimensionedScalar
-        (
-            "p",
-            p.dimensions(),
-            pRefValue - getRefCellValue(p, pRefCell)
-        );
-    }
     
 
 
