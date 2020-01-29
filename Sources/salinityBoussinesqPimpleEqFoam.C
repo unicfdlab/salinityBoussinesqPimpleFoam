@@ -50,6 +50,8 @@ Description
 #include "turbulentTransportModel.H"
 #include "pimpleControl.H"
 #include "MULES.H"
+#include "upwind.H"
+#include "gaussConvectionScheme.H"
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

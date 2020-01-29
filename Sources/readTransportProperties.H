@@ -1,16 +1,40 @@
     singlePhaseTransportModel laminarTransport(U, phi);
-
+    
     // Thermal expansion coefficient [1/K]
-    dimensionedScalar beta(laminarTransport.lookup("beta"));
-
+    dimensionedScalar beta
+    (
+        "beta",
+        dimensionSet(0,0,0,-1,0),
+        0.0,
+        laminarTransport
+    );
+    
     // Reference temperature [K]
-    dimensionedScalar SARef(laminarTransport.lookup("SARef"));
-
-    //
-    dimensionedScalar DS (laminarTransport.lookup("DS"));
+    dimensionedScalar SARef
+    (
+        "SARef",
+        dimensionSet(0,0,0,1,0),
+        1.0,
+        laminarTransport
+    );
     
     //
-    dimensionedScalar rho0 (laminarTransport.lookup("rho0"));
+    dimensionedScalar DS
+    (
+        "DS",
+        dimensionSet(0,2,-1,0,0),
+        0.0,
+        laminarTransport
+    );
+    
+    //
+    dimensionedScalar rho0
+    (
+        "rho0",
+        dimensionSet(1,-3,0,0,0),
+        1.0,
+        laminarTransport
+    );
     
     //-
     Switch salinityFVM (laminarTransport.lookup("salinityFVM"));
@@ -19,7 +43,13 @@
     Switch correctSalinity (laminarTransport.lookup("correctSalinity"));
     
     //-
-    dimensionedScalar Sct (laminarTransport.lookup("Sct"));
+    dimensionedScalar Sct
+    (
+        "Sct",
+        dimless,
+        1.0,
+        laminarTransport
+    );
 
     /*
     // Laminar Prandtl number

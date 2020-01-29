@@ -1,30 +1,21 @@
 {
     if (salinityFVM)
     {
-	/*
-	kappat = turbulence->nut()/Prt;
-	kappat.correctBoundaryConditions();
+        volScalarField DSEff ("DSEff", turbulence->nut()/Sct + DS);
 
-	volScalarField kappaEff("kappaEff", turbulence->nu()/Pr + kappat);
-	*/
-	
-	volScalarField DSEff ("DSEff", turbulence->nut()/Sct + DS);
+        fvScalarMatrix salinityEqn
+        (
+            fvm::ddt(SA)
+            + fvm::div(phi, SA)
+            - fvm::laplacian(DSEff, SA)
+        );
 
-	fvScalarMatrix salinityEqn
-	(
-	    fvm::ddt(SA)
-	    + fvm::div(phi, SA)
-	    - fvm::laplacian(DSEff, SA)
-	);
-
-	salinityEqn.relax();
-	salinityEqn.solve();
-	
+        salinityEqn.relax();
+        salinityEqn.solve();
     }
     else
     {
-	word salinityScheme("div(phi,SA)");
-	word alpharScheme("div(phirb,alpha)");
+        word salinityScheme("div(phi,SA)");
 
         surfaceScalarField phiSA
         (
@@ -34,49 +25,22 @@
                 SA,
                 salinityScheme
             )
-//don't use compressive flux
-//            + fvc::flux
-//            (
-//                -fvc::flux(-phir, scalar(1) - alpha1, alpharScheme),
-//                alpha1,
-//                alpharScheme
-//            )
-        );
-        
-        volScalarField Sp
-        (
-            IOobject
-            (
-                "Sp",
-                runTime.timeName(),
-                mesh
-            ),
-            fvc::div(phi) * 0.0
         );
 
-        volScalarField Su
-        (
-            IOobject
-            (
-                "Su",
-                runTime.timeName(),
-                mesh
-            ),
-            // Divergence term is handled explicitly to be
-            // consistent with the explicit transport solution
-	    -Sp*SA
-        );
+        upwind<scalar> UD (mesh, phi);
+        surfaceScalarField phiSA_upwind = 
+            fv::gaussConvectionScheme<scalar>(mesh,phi,UD).flux(phi,SA);
         
         MULES::explicitSolve
         (
             geometricOneField(),
             SA,
-            phi,
+            phiSA_upwind,
             phiSA,
-            Sp,
-            Su,
-            1,
-            0
+            zeroField(),
+            zeroField(),
+            oneField(),
+            zeroField()
         );
     }
 
